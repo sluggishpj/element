@@ -175,4 +175,194 @@ button--by {
 }
 ```
 
+## Radio
+
+### BEM
+
+```scss
+// config.scss
+$namespace: 'el';
+$element-separator: '__';
+$modifier-separator: '--';
+$state-prefix: 'is-';
+
+// function.scss
+/* BEM support Func
+ -------------------------- */
+// selectorToString($namespace) => el
+@function selectorToString($selector) {
+  $selector: inspect($selector); // 获取变量的字符串形式(含"") => "el"
+  $selector: str-slice($selector, 2, -2); // 去除前后2个" => el
+  @return $selector;
+}
+
+// 判断 $selector 是否包含 $modifier-separator (即--)
+@function containsModifier($selector) {
+  $selector: selectorToString($selector);
+
+  @if str-index($selector, $modifier-separator) {
+    @return true;
+  } @else {
+    @return false;
+  }
+}
+
+// 判断 $selector 是否包含 '.'+ $state-prefix (即 .is-)
+@function containWhenFlag($selector) {
+  $selector: selectorToString($selector);
+
+  @if str-index($selector, '.' + $state-prefix) {
+    @return true;
+  } @else {
+    @return false;
+  }
+}
+
+// 判断 $selector 是否包含 ':'
+@function containPseudoClass($selector) {
+  $selector: selectorToString($selector);
+
+  @if str-index($selector, ':') {
+    @return true;
+  } @else {
+    @return false;
+  }
+}
+
+// 包含 -- 或 .is- 或 :
+@function hitAllSpecialNestRule($selector) {
+  @return containsModifier($selector) or containWhenFlag($selector) or containPseudoClass($selector);
+}
+
+/* BEM eg. .el-radio__input--small
+ -------------------------- */
+@mixin b($block) {
+  $B: $namespace + '-' + $block !global;
+
+  .#{$B} {
+    @content;
+  }
+}
+
+@mixin e($element) {
+  $E: $element !global;
+  $selector: &;
+  $currentSelector: '';
+  @each $unit in $element {
+    $currentSelector: #{$currentSelector + '.' + $B + $element-separator + $unit + ','};
+  }
+
+  @if hitAllSpecialNestRule($selector) {
+    @at-root {
+      #{$selector} {
+        #{$currentSelector} {
+          @content;
+        }
+      }
+    }
+  } @else {
+    @at-root {
+      #{$currentSelector} {
+        @content;
+      }
+    }
+  }
+}
+
+@mixin m($modifier) {
+  $selector: &;
+  $currentSelector: '';
+  @each $unit in $modifier {
+    $currentSelector: #{$currentSelector + & + $modifier-separator + $unit + ','};
+  }
+
+  @at-root {
+    #{$currentSelector} {
+      @content;
+    }
+  }
+}
+
+@include b(radio) {
+  line-height: 1.5;
+  @include e(input) {
+    outline: none;
+    @include m(small) {
+      line-height: 1;
+    }
+  }
+}
+
+/* Test  hitAllSpecialNestRule 其实就是多嵌套一层*/
+@include b('radio.is-disable') {
+  @include e(input) {
+    outline: none;
+  }
+}
+```
+
+=> CSS
+
+```css
+.el-radio {
+  line-height: 1.5;
+}
+.el-radio__input {
+  outline: none;
+}
+.el-radio__input--small {
+  line-height: 1;
+}
+
+/* Test  hitAllSpecialNestRule 其实就是多嵌套一层*/
+.el-radio.is-disable .el-radio.is-disable__input {
+  outline: none;
+}
+```
+
+### dispatch & broadcast
+
+触发特定组件的特定事件
+
+```js
+// src/mixins/emitter.js
+
+function broadcast(componentName, eventName, params) {
+  this.$children.forEach((child) => {
+    var name = child.$options.componentName;
+
+    if (name === componentName) {
+      child.$emit.apply(child, [eventName].concat(params));
+    } else {
+      broadcast.apply(child, [componentName, eventName].concat([params]));
+    }
+  });
+}
+
+export default {
+  methods: {
+    // 找到离自己最近的componentName祖先元素，触发其 eventName 事件，参数是 ...params
+    dispatch(componentName, eventName, params) {
+      var parent = this.$parent || this.$root;
+      var name = parent.$options.componentName;
+
+      while (parent && (!name || name !== componentName)) {
+        parent = parent.$parent;
+
+        if (parent) {
+          name = parent.$options.componentName;
+        }
+      }
+      if (parent) {
+        parent.$emit.apply(parent, [eventName].concat(params));
+      }
+    },
+    // 找到自己包含的所有componentName子元素，触发其 eventName 事件，参数是 ...params
+    broadcast(componentName, eventName, params) {
+      broadcast.call(this, componentName, eventName, params);
+    },
+  },
+};
+```
+
 > https://www.sassmeister.com/

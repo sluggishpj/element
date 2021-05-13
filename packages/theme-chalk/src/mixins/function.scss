@@ -1,13 +1,15 @@
-@import "config";
+@import 'config';
 
 /* BEM support Func
  -------------------------- */
+// selectorToString($namespace) => el
 @function selectorToString($selector) {
-  $selector: inspect($selector);
-  $selector: str-slice($selector, 2, -2);
+  $selector: inspect($selector); // 获取变量的字符串形式(含"") => "el"
+  $selector: str-slice($selector, 2, -2); // 去除前后2个" => el
   @return $selector;
 }
 
+// 判断 $selector 是否包含 $modifier-separator (即--)
 @function containsModifier($selector) {
   $selector: selectorToString($selector);
 
@@ -18,27 +20,29 @@
   }
 }
 
+// 判断 $selector 是否包含 '.'+ $state-prefix (即 .is-)
 @function containWhenFlag($selector) {
   $selector: selectorToString($selector);
 
   @if str-index($selector, '.' + $state-prefix) {
-    @return true
+    @return true;
   } @else {
-    @return false
+    @return false;
   }
 }
 
+// 判断 $selector 是否包含 ':'
 @function containPseudoClass($selector) {
   $selector: selectorToString($selector);
 
   @if str-index($selector, ':') {
-    @return true
+    @return true;
   } @else {
-    @return false
+    @return false;
   }
 }
 
+// 包含 -- 或 .is- 或 :
 @function hitAllSpecialNestRule($selector) {
-
   @return containsModifier($selector) or containWhenFlag($selector) or containPseudoClass($selector);
 }
