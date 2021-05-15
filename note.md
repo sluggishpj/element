@@ -175,7 +175,7 @@ button--by {
 }
 ```
 
-## Radio
+## Radio 单选框
 
 ### BEM
 
@@ -366,3 +366,39 @@ export default {
 ```
 
 > https://www.sassmeister.com/
+
+## Checkbox 多选框
+
+### v-model 使用 computed 属性，拦截 set 操作
+
+```vue
+<template>
+  <input type="checkbox" :value="label" :name="name" v-model="model" />
+</template>
+
+<script>
+export default {
+  computed: {
+    model: {
+      get() {
+        return this.isGroup ? this.store : this.value !== undefined ? this.value : this.selfModel;
+      },
+
+      set(val) {
+        this.isLimitExceeded = false;
+        this._checkboxGroup.min !== undefined &&
+          val.length < this._checkboxGroup.min &&
+          (this.isLimitExceeded = true);
+
+        this._checkboxGroup.max !== undefined &&
+          val.length > this._checkboxGroup.max &&
+          (this.isLimitExceeded = true);
+
+        // 条件满足后才触发实际修改
+        this.isLimitExceeded === false && this.dispatch('ElCheckboxGroup', 'input', [val]);
+      },
+    },
+  },
+};
+</script>
+```

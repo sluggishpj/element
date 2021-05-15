@@ -99,6 +99,7 @@
               val.length > this._checkboxGroup.max &&
               (this.isLimitExceeded = true));
 
+            // 条件满足后才触发实际修改
             this.isLimitExceeded === false &&
             this.dispatch('ElCheckboxGroup', 'input', [val]);
           } else {
@@ -136,6 +137,7 @@
       },
 
       /* used to make the isDisabled judgment under max/min props */
+      // 是否因数量限制而不可选
       isLimitDisabled() {
         const { max, min } = this._checkboxGroup;
         return !!(max || min) &&
