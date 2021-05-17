@@ -70,13 +70,13 @@ export default function calcTextareaHeight(
   hiddenTextarea.setAttribute('style', `${contextStyle};${HIDDEN_STYLE}`);
   hiddenTextarea.value = targetElement.value || targetElement.placeholder || '';
 
-  let height = hiddenTextarea.scrollHeight;
+  let height = hiddenTextarea.scrollHeight; // 文字高度+padding
   const result = {};
 
   if (boxSizing === 'border-box') {
-    height = height + borderSize;
+    height = height + borderSize; // 确保内容高度一致
   } else if (boxSizing === 'content-box') {
-    height = height - paddingSize;
+    height = height - paddingSize; // 确保内容高度一致
   }
 
   hiddenTextarea.value = '';

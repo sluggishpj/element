@@ -337,21 +337,27 @@
         this.focused = true;
         this.$emit('focus', event);
       },
+      // https://developer.mozilla.org/zh-CN/docs/Web/API/Element/compositionstart_event
+      // 拼音输入时会触发：顺序 compositionstart => compositionstart [value] => input [value] => compositionstart [value] => input [value] =>... => compositionend [value] => input [value]
       handleCompositionStart() {
+        console.log('handleCompositionStart');
         this.isComposing = true;
       },
       handleCompositionUpdate(event) {
+        console.log('handleCompositionUpdate', event);
         const text = event.target.value;
         const lastCharacter = text[text.length - 1] || '';
         this.isComposing = !isKorean(lastCharacter);
       },
       handleCompositionEnd(event) {
+        console.log('handleCompositionEnd', event);
         if (this.isComposing) {
           this.isComposing = false;
           this.handleInput(event);
         }
       },
       handleInput(event) {
+        console.log('input', event);
         // should not emit input during composition
         // see: https://github.com/ElemeFE/element/issues/10516
         if (this.isComposing) return;

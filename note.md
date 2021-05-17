@@ -402,3 +402,23 @@ export default {
 };
 </script>
 ```
+
+## input 输入框
+
+### 文本合成事件
+
+使用输入法编辑器 (IME) 输入中文/日文等，会触发文本合成事件。事件顺序：
+
+`compositionstart` => `compositionstart` [value] => `input` [value] => `compositionstart` [value] => `input` [value] =>... => `compositionend` [value] => `input` [value]
+
+<iframe height="325" style="width: 100%;" scrolling="no" title="composition event" src="https://codepen.io/sluggishpj/embed/poebXYX?height=325&theme-id=dark&default-tab=js,result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+  See the Pen <a href='https://codepen.io/sluggishpj/pen/poebXYX'>composition event</a> by pj
+  (<a href='https://codepen.io/sluggishpj'>@sluggishpj</a>) on <a href='https://codepen.io'>CodePen</a>.
+</iframe>
+
+### box-sizing
+
+- `content-box`: `width` = 内容的宽度, `height` = 内容的高度
+- `border-box`: `width` = `border` + `padding` + 内容的宽度, `height` = `border` + `padding` + 内容的高度
+
+> https://developer.mozilla.org/zh-CN/docs/Web/CSS/box-sizing
