@@ -422,3 +422,10 @@ export default {
 - `border-box`: `width` = `border` + `padding` + 内容的宽度, `height` = `border` + `padding` + 内容的高度
 
 > https://developer.mozilla.org/zh-CN/docs/Web/CSS/box-sizing
+
+## el-scroll-bar
+
+### Element.getBoundingClientRect()
+
+方法返回元素的大小及其相对于视口的位置
+
